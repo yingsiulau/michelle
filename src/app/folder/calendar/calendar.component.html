@@ -4,43 +4,47 @@
       <ion-datetime
         size="cover"
         mode="ios"
+        presentation="date"
         [highlightedDates]="highlightedDates"
+        [(ngModel)]="selectedDates"
+        [multiple]="multiple"
+        (ionChange)="onDateChange($event)"
       >
-        <div slot="time-label">Enter Time</div>
       </ion-datetime>
     </div>
 
-    <ion-card>
-      <ion-card-header>
-        <div style="display: flex; justify-content: space-between">
-          <div>
-            <ion-card-title>Card Title</ion-card-title>
-            <ion-card-subtitle>Card Subtitle</ion-card-subtitle>
-          </div>
-          <div>
-            <ion-button id="open-action-sheet">
-              <ion-icon name="ellipsis-vertical"></ion-icon>
-            </ion-button>
+    <ion-list>
+      <ion-item>
+        <ion-toggle
+          justify="space-between"
+          [(ngModel)]="multiple"
+          (ngModelChange)="toggleSelectionMode()"
+          >Multiple Date Selector</ion-toggle
+        >
+      </ion-item>
+      <div *ngFor="let entry of entries; let i = index">
+        <ion-item-sliding *ngIf="isSelectedDateInEntry()?.includes(i)">
+          <ion-item>
+            <ion-label>
+              index= {{ i }} {{ entry.title }} <br />
+              {{ entry.description }}
+            </ion-label>
+            <ion-label style="text-align: right"
+              >{{ entry.dates[0] }} <br />{{ entry.time }}</ion-label
+            >
+          </ion-item>
 
-            <ion-action-sheet
-              trigger="open-action-sheet"
-              class="my-custom-class"
-              header="Example header"
-              subHeader="Example subheader"
-              [buttons]="actionSheetButtons"
-            ></ion-action-sheet>
-          </div>
-        </div>
-      </ion-card-header>
-
-      <ion-card-content>
-        Here's a small text description for the card content. Nothing more,
-        nothing less.
-      </ion-card-content>
-
-      <ion-button fill="clear">Action 1</ion-button>
-      <ion-button fill="clear">Action 2</ion-button>
-    </ion-card>
+          <ion-item-options side="end">
+            <ion-item-option>
+              <ion-icon slot="icon-only" name="pencil"></ion-icon>
+            </ion-item-option>
+            <ion-item-option color="danger">
+              <ion-icon slot="icon-only" name="trash"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      </div>
+    </ion-list>
 
     <ion-modal trigger="open-modal" (willDismiss)="onWillDismiss($event)">
       <ng-template>
@@ -71,6 +75,7 @@
       </ng-template>
     </ion-modal>
   </div>
+
   <ion-fab slot="fixed" vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button id="open-modal">
       <ion-icon name="add"></ion-icon>

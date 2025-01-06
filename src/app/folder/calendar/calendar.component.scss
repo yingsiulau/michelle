@@ -1,6 +1,6 @@
 .wrapper {
   height: calc(100vh - 100px);
-  margin-top: 100px;
+  margin-top: 55px;
   width: 100%;
   color: white;
 }
@@ -16,8 +16,20 @@ ion-datetime {
 }
 
 ion-fab {
-    position: absolute;
-    right: 20px;
-    bottom: 20px;
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
   margin-bottom: var(--ion-safe-area-bottom, 0);
+}
+
+.item-native {
+  height: 40px;
+}
+
+:host ::ng-deep .calendar-next-prev {
+background-color: white !important;
+}
+
+ion-datetime::part(month-year-button) {
+  padding: 8px 20px
 }
