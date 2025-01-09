@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
+
 import {
   IonDatetime, IonLabel, IonInput, IonItem, IonContent, IonButton,
   IonButtons,
@@ -23,7 +25,7 @@ import { OverlayEventDetail } from '@ionic/core/components';
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
   imports: [IonList, CommonModule, FormsModule, IonDatetime, IonLabel, IonInput, IonItem, IonButton, IonContent, IonModal, IonHeader, IonTitle, IonToolbar, IonButtons, IonFab, IonFabButton, IonIcon,
-    IonItemOption, IonItemOptions, IonItemSliding, IonToggle, IonPicker, IonPickerColumn, IonPickerColumnOption, IonSelect, IonSelectOption, IonAccordion, IonAccordionGroup, IonText
+    IonItemOption, IonItemOptions, IonItemSliding, IonToggle, IonPicker, IonPickerColumn, IonPickerColumnOption, IonSelect, IonSelectOption, IonAccordion, IonAccordionGroup, IonText, ReactiveFormsModule
   ]
 })
 export class CalendarComponent implements OnInit {
@@ -32,6 +34,7 @@ export class CalendarComponent implements OnInit {
   message = 'This modal example uses triggers to automatically open a modal when the button is clicked.';
   name!: string;
   multiple = false;
+  currentColor = '#9cc2ff';
 
   public actionSheetButtons = [
     {
@@ -57,24 +60,36 @@ export class CalendarComponent implements OnInit {
   ];
 
   selectedDates: any = null; // null for single mode, [] for multiple mode
-  entries = [{ title: 'title', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#ff5722", author: 'Ying', dates: ['2025-01-22', '2025-01-21', '2025-01-23'], },
-  { title: 'title', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#0f5722", author: 'Ying', dates: ['2025-01-27', '2025-01-28', '2025-01-29',] },
-  { title: 'title', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#BBBBBB", author: 'Michelle', dates: ['2025-01-30',] },
-  { title: 'DUBLICATE', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#BBBBBB", author: 'Michelle', dates: ['2025-01-30',] }];
+  entries: {
+    title: string;
+    description: string;
+    time: string;
+    textColor: string;
+    backgroundColor: string;
+    author: string[];
+    dates: string[];
+  }[] = [{ title: 'title', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#ff5722", author: ['Ying'], dates: ['2025-01-22', '2025-01-21', '2025-01-23'], },
+  { title: 'title', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#0f5722", author: ['Ying'], dates: ['2025-01-27', '2025-01-28', '2025-01-29',] },
+  { title: 'title', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#BBBBBB", author: ['Michelle'], dates: ['2025-01-30',] },
+  { title: 'DUBLICATE', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#BBBBBB", author: ['Michelle'], dates: ['2025-01-30',] }];
   highlightedDates = [
     {},
   ];
 
-  newEntry = {
-    title: '', description: '', time: '', textColor: '', backgroundColor: '', author: [], dates: []
-  }
+  newEntry: {
+    title: string;
+    description: string;
+    time: string;
+    textColor: string;
+    backgroundColor: string;
+    author: string[];
+    dates: string[];
+  } = {
+      title: '', description: '', time: '', textColor: '#000000', backgroundColor: this.currentColor, author: [], dates: [],
+    }
 
-
-  currentColor = '#9cc2ff';
   isColorModalOpen = false;
   isTimeModalOpen = false; // Track modal open/close state
-
-
 
   constructor() { addIcons({ add, ellipse }); }
 
@@ -89,7 +104,6 @@ export class CalendarComponent implements OnInit {
           date: date,
           textColor: item.textColor,
           backgroundColor: item.backgroundColor,
-
         });
       });
     });
@@ -100,6 +114,19 @@ export class CalendarComponent implements OnInit {
   }
 
   confirm() {
+    this.entries.push(this.newEntry);
+    this.newEntry.dates.forEach(date => {
+      this.highlightedDates.push({
+        date: date,
+        textColor: this.newEntry.textColor,
+        backgroundColor: this.newEntry.backgroundColor
+      })
+    });
+
+    this.newEntry = {
+      title: '', description: '', time: '', textColor: '#000000', backgroundColor: '', author: [], dates: [],
+    };
+    this.selectedDates = {};
     this.modal.dismiss(this.name, 'confirm');
   }
 
@@ -110,8 +137,6 @@ export class CalendarComponent implements OnInit {
   }
 
   toggleSelectionMode() {
-    console.log(this.multiple);
-    
     if (!this.multiple) {
       this.selectedDates = this.selectedDates?.[0] || null;
     } else {
@@ -123,7 +148,9 @@ export class CalendarComponent implements OnInit {
     if (this.selectedDates.indexOf('T') > -1) {
       this.selectedDates = this.selectedDates.split('T')[0];
     }
-    this.isSelectedDateInEntry()
+    this.isSelectedDateInEntry();
+    var newDates = Array.isArray(this.selectedDates) ? this.selectedDates : [this.selectedDates];
+    this.newEntry.dates = newDates
   }
 
   isSelectedDateInEntry(): number[] | null {
@@ -156,11 +183,6 @@ export class CalendarComponent implements OnInit {
     }
     return firstLast
   }
-
-
-
-
-
 
   openColorModal() {
     this.isColorModalOpen = true;

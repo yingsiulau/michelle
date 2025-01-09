@@ -70,6 +70,7 @@
                 placeholder="Title (Required)"
                 required="true"
                 [(ngModel)]="newEntry.title"
+                ngDefaultControl
               >
             </ion-input>
             </ion-item>
@@ -77,6 +78,7 @@
               <ion-textarea
                 placeholder="Description"
                 [(ngModel)]="newEntry.description"
+                ngDefaultControl
               >
               </ion-textarea>
             </ion-item>
@@ -95,6 +97,7 @@
                     presentation="time"
                     size="cover"
                     [(ngModel)]="newEntry.time"
+                    ngDefaultControl
                     (ionChange)="onTimeChange($event)"
                   ></ion-datetime>
                 </div>
@@ -168,6 +171,7 @@
                 aria-label="Authors"
                 placeholder="For who is this?"
                 [multiple]="true"
+                [(ngModel)]="newEntry.author"
               >
                 <ion-select-option value="Yingsiu">Yingsiu</ion-select-option>
                 <ion-select-option value="Michelle">Michelle</ion-select-option>
