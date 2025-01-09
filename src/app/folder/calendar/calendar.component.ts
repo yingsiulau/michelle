@@ -14,9 +14,9 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add, ellipse } from 'ionicons/icons';
-
-
 import { OverlayEventDetail } from '@ionic/core/components';
+import { Entry } from '../../../model/entry'; // Adjust the path as needed
+import { HighlightedDate } from '../../../model/highlightedDate'; // Adjust the path as needed
 
 
 @Component({
@@ -35,6 +35,7 @@ export class CalendarComponent implements OnInit {
   name!: string;
   multiple = false;
   currentColor = '#9cc2ff';
+  editingIndex: number | null = null;
 
   public actionSheetButtons = [
     {
@@ -60,33 +61,15 @@ export class CalendarComponent implements OnInit {
   ];
 
   selectedDates: any = null; // null for single mode, [] for multiple mode
-  entries: {
-    title: string;
-    description: string;
-    time: string;
-    textColor: string;
-    backgroundColor: string;
-    author: string[];
-    dates: string[];
-  }[] = [{ title: 'title', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#ff5722", author: ['Ying'], dates: ['2025-01-22', '2025-01-21', '2025-01-23'], },
+  entries: Entry[] = [{ title: 'title', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#ff5722", author: ['Ying'], dates: ['2025-01-22', '2025-01-21', '2025-01-23'], },
   { title: 'title', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#0f5722", author: ['Ying'], dates: ['2025-01-27', '2025-01-28', '2025-01-29',] },
   { title: 'title', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#BBBBBB", author: ['Michelle'], dates: ['2025-01-30',] },
   { title: 'DUBLICATE', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#BBBBBB", author: ['Michelle'], dates: ['2025-01-30',] }];
-  highlightedDates = [
-    {},
-  ];
+  highlightedDates: HighlightedDate[] = [];
 
-  newEntry: {
-    title: string;
-    description: string;
-    time: string;
-    textColor: string;
-    backgroundColor: string;
-    author: string[];
-    dates: string[];
-  } = {
-      title: '', description: '', time: '', textColor: '#000000', backgroundColor: this.currentColor, author: [], dates: [],
-    }
+  newEntry: Entry = {
+    title: '', description: '', time: '', textColor: '#000000', backgroundColor: this.currentColor, author: [], dates: [],
+  }
 
   isColorModalOpen = false;
   isTimeModalOpen = false; // Track modal open/close state
@@ -113,28 +96,64 @@ export class CalendarComponent implements OnInit {
     this.modal.dismiss(null, 'cancel');
   }
 
-  confirm() {
-    this.entries.push(this.newEntry);
-    this.newEntry.dates.forEach(date => {
-      this.highlightedDates.push({
-        date: date,
-        textColor: this.newEntry.textColor,
-        backgroundColor: this.newEntry.backgroundColor
-      })
-    });
+  openEditModal(entry: any | null, index: number | null) {
+    if (entry != null && index != null) {
+      this.editingIndex = index; // Store the index of the entry being edited
+      this.newEntry = { ...entry }; // Create a copy to avoid directly mutating the entry
+    }
+    this.modal.present();
+  }
 
+  confirm() {
+    if (this.editingIndex !== null) {
+      // Update the existing entry
+      this.entries[this.editingIndex] = { ...this.newEntry };
+    } else {
+      // Add a new entry
+      this.entries.push({ ...this.newEntry });
+      this.newEntry.dates.forEach(date => {
+        this.highlightedDates.push({
+          date: date,
+          textColor: this.newEntry.textColor,
+          backgroundColor: this.newEntry.backgroundColor,
+        });
+      });
+    }
+
+    // Reset the form and editing state
     this.newEntry = {
-      title: '', description: '', time: '', textColor: '#000000', backgroundColor: '', author: [], dates: [],
+      title: '', description: '', time: '', textColor: '#000000',
+      backgroundColor: this.currentColor, author: [], dates: [],
     };
     this.selectedDates = {};
-    this.modal.dismiss(this.name, 'confirm');
+    this.editingIndex = null; // Reset editing state
+    this.modal.dismiss();
   }
+
 
   onWillDismiss(event: CustomEvent<OverlayEventDetail>) {
     if (event.detail.role === 'confirm') {
       this.message = `Hello, ${event.detail.data}!`;
     }
   }
+
+  deleteEntry(index: number): void {
+    // Get the dates of the entry being deleted
+    const entryToDelete = this.entries[index];
+    const datesToRemove = entryToDelete.dates;
+  
+    // Reassign the entries array without the deleted entry
+    this.entries = this.entries.filter((_, i) => i !== index);
+  
+    // Update highlightedDates to remove dates associated with the deleted entry
+    this.highlightedDates = this.highlightedDates.filter(
+      (highlight) => !datesToRemove.includes(highlight.date)
+    );
+  
+    console.log('Entry deleted. Updated entries:', this.entries);
+    console.log('Updated highlightedDates:', this.highlightedDates);
+  }
+  
 
   toggleSelectionMode() {
     if (!this.multiple) {
@@ -206,6 +225,7 @@ export class CalendarComponent implements OnInit {
 
   onIonChange(event: any) {
     this.currentColor = event.detail.value;
+    this.newEntry.backgroundColor = this.currentColor;
   }
 
 

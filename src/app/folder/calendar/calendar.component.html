@@ -34,12 +34,11 @@
               >{{ entry.dates[0] }} <br />{{ entry.time }}</ion-label
             >
           </ion-item>
-
           <ion-item-options side="end">
-            <ion-item-option>
+            <ion-item-option id="open-modal" (click)="openEditModal(entry, i)">
               <ion-icon slot="icon-only" name="pencil"></ion-icon>
             </ion-item-option>
-            <ion-item-option color="danger">
+            <ion-item-option color="danger" (click)="deleteEntry(i)">
               <ion-icon slot="icon-only" name="trash"></ion-icon>
             </ion-item-option>
           </ion-item-options>
@@ -54,7 +53,12 @@
             <ion-buttons slot="start">
               <ion-button (click)="cancel()">Cancel</ion-button>
             </ion-buttons>
-            <ion-title>Create new entry</ion-title>
+            <ion-title>
+              <ng-container *ngIf="editingIndex === null; else editMode">
+                Create New Entry
+              </ng-container>
+              <ng-template #editMode> Edit Entry </ng-template>
+            </ion-title>
             <ion-buttons slot="end">
               <ion-button (click)="confirm()" [strong]="true"
                 >Confirm</ion-button
@@ -72,7 +76,7 @@
                 [(ngModel)]="newEntry.title"
                 ngDefaultControl
               >
-            </ion-input>
+              </ion-input>
             </ion-item>
             <ion-item>
               <ion-textarea
