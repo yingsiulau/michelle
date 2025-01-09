@@ -38,3 +38,15 @@ ion-datetime::part(month-year-button) {
   width: 100%;
   --width: 100%; /* For Ionic's internal styling */
 }
+
+
+ion-segment{
+  margin-bottom: 10px;
+}
+
+ion-datetime {
+  --background: #181818;
+  --background-rgb: 24,24,24;
+
+  box-shadow: rgba(var(--ion-color-rose-rgb), 0.3) 0px 10px 15px -3px;
+}
