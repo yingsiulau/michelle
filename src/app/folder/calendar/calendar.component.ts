@@ -8,10 +8,11 @@ import {
   IonModal,
   IonTitle,
   IonToolbar,
-  IonFab, IonFabButton, IonIcon, IonList, IonItemOption, IonItemOptions, IonItemSliding, IonToggle
+  IonFab, IonFabButton, IonIcon, IonList, IonItemOption, IonItemOptions, IonItemSliding, IonToggle, IonPicker, IonPickerColumn, IonPickerColumnOption, IonSelect, IonSelectOption, IonAccordion, IonAccordionGroup, IonText
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add, ellipse } from 'ionicons/icons';
+
 
 import { OverlayEventDetail } from '@ionic/core/components';
 
@@ -22,7 +23,8 @@ import { OverlayEventDetail } from '@ionic/core/components';
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
   imports: [IonList, CommonModule, FormsModule, IonDatetime, IonLabel, IonInput, IonItem, IonButton, IonContent, IonModal, IonHeader, IonTitle, IonToolbar, IonButtons, IonFab, IonFabButton, IonIcon,
-    IonItemOption, IonItemOptions, IonItemSliding, IonToggle]
+    IonItemOption, IonItemOptions, IonItemSliding, IonToggle, IonPicker, IonPickerColumn, IonPickerColumnOption, IonSelect, IonSelectOption, IonAccordion, IonAccordionGroup, IonText
+  ]
 })
 export class CalendarComponent implements OnInit {
   @ViewChild(IonModal) modal!: IonModal;
@@ -55,19 +57,29 @@ export class CalendarComponent implements OnInit {
   ];
 
   selectedDates: any = null; // null for single mode, [] for multiple mode
-  entries = [{ title: 'title', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#ff5722", dates: ['2025-01-22', '2025-01-21', '2025-01-23'] },
-  { title: 'title', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#0f5722", dates: ['2025-01-27', '2025-01-28', '2025-01-29',] },
-  { title: 'title', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#BBBBBB", dates: ['2025-01-30',] },
-  { title: 'DUBLICATE', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#BBBBBB", dates: ['2025-01-30',] }];
+  entries = [{ title: 'title', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#ff5722", author: 'Ying', dates: ['2025-01-22', '2025-01-21', '2025-01-23'], },
+  { title: 'title', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#0f5722", author: 'Ying', dates: ['2025-01-27', '2025-01-28', '2025-01-29',] },
+  { title: 'title', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#BBBBBB", author: 'Michelle', dates: ['2025-01-30',] },
+  { title: 'DUBLICATE', description: 'test', time: '12:00', textColor: '#ffffff', backgroundColor: "#BBBBBB", author: 'Michelle', dates: ['2025-01-30',] }];
   highlightedDates = [
     {},
   ];
+
+  newEntry = {
+    title: '', description: '', time: '', textColor: '', backgroundColor: '', author: [], dates: []
+  }
+
+
+  currentColor = '#9cc2ff';
+  isColorModalOpen = false;
+  isTimeModalOpen = false; // Track modal open/close state
+
+
 
   constructor() { addIcons({ add, ellipse }); }
 
   ngOnInit() {
     this.generateHighlightedDates();
-    this.isSelectedDateInEntry();
   }
 
   private generateHighlightedDates(): void {
@@ -98,6 +110,8 @@ export class CalendarComponent implements OnInit {
   }
 
   toggleSelectionMode() {
+    console.log(this.multiple);
+    
     if (!this.multiple) {
       this.selectedDates = this.selectedDates?.[0] || null;
     } else {
@@ -127,4 +141,58 @@ export class CalendarComponent implements OnInit {
     return matchingIndices.length > 0 ? matchingIndices : null;
   }
 
+  displayDates() {
+    if (Array.isArray(this.selectedDates)) {
+      this.selectedDates = this.selectedDates.sort()
+      let firstLast = {
+        first: this.selectedDates[0],
+        last: this.selectedDates[this.selectedDates.length - 1]
+      }
+      return firstLast
+    }
+    let firstLast = {
+      first: this.selectedDates,
+      last: null
+    }
+    return firstLast
+  }
+
+
+
+
+
+
+  openColorModal() {
+    this.isColorModalOpen = true;
+  }
+
+  closeColorModal() {
+    this.isColorModalOpen = false;
+  }
+
+  confirmColorSelection() {
+    // Handle selected color logic here
+    this.closeColorModal();
+  }
+
+  onColorModalDismiss(event: any) {
+    if (event.detail.role === 'cancel') {
+      // Optional: handle cancel action
+    }
+    this.isColorModalOpen = false;
+  }
+
+  onIonChange(event: any) {
+    this.currentColor = event.detail.value;
+  }
+
+
+  onAuthorChange(event: any) {
+    // Update the newEntry.author field with the selected authors
+    this.newEntry.author = event.detail.value;
+    console.log('Selected Authors for newEntry:', this.newEntry.author);
+  }
+  onTimeChange(event: any) {
+    this.newEntry.time = event.detail.value;
+  }
 }

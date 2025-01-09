@@ -2,6 +2,7 @@
   <div class="wrapper">
     <div class="calendar">
       <ion-datetime
+        id="calendar"
         size="cover"
         mode="ios"
         presentation="date"
@@ -53,7 +54,7 @@
             <ion-buttons slot="start">
               <ion-button (click)="cancel()">Cancel</ion-button>
             </ion-buttons>
-            <ion-title>Welcome</ion-title>
+            <ion-title>Create new entry</ion-title>
             <ion-buttons slot="end">
               <ion-button (click)="confirm()" [strong]="true"
                 >Confirm</ion-button
@@ -62,15 +63,117 @@
           </ion-toolbar>
         </ion-header>
         <ion-content class="ion-padding">
-          <ion-item>
-            <ion-input
-              label="Enter your name"
-              labelPlacement="stacked"
-              type="text"
-              placeholder="Your name"
-              [(ngModel)]="name"
-            ></ion-input>
-          </ion-item>
+          <ion-list>
+            <ion-item>
+              <ion-input
+                type="text"
+                placeholder="Title (Required)"
+                required="true"
+                [(ngModel)]="newEntry.title"
+              >
+            </ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-textarea
+                placeholder="Description"
+                [(ngModel)]="newEntry.description"
+              >
+              </ion-textarea>
+            </ion-item>
+
+            <ion-accordion-group class="full-width">
+              <ion-accordion>
+                <ion-item slot="header" class="full-width">
+                  <ion-label>Select Time</ion-label>
+                  <ion-text>
+                    {{ newEntry.time }}
+                  </ion-text>
+                </ion-item>
+                <div slot="content">
+                  <ion-datetime
+                    class="full-width"
+                    presentation="time"
+                    size="cover"
+                    [(ngModel)]="newEntry.time"
+                    (ionChange)="onTimeChange($event)"
+                  ></ion-datetime>
+                </div>
+              </ion-accordion>
+            </ion-accordion-group>
+            <ion-item>
+              <ion-label>
+                {{ displayDates().first }}
+              </ion-label>
+            </ion-item>
+            <ng-container *ngIf="displayDates().last != null">
+              <ion-item>
+                <ion-label>
+                  {{ displayDates().last }}
+                </ion-label>
+              </ion-item>
+            </ng-container>
+            <ion-item>
+              <ion-button
+                (click)="openColorModal()"
+                [ngStyle]="{
+                  '--background': currentColor,
+                  '--color': '#000000'
+                }"
+                >Color</ion-button
+              >
+              <ion-modal
+                #modal
+                trigger="open-color"
+                [isOpen]="isColorModalOpen"
+                (didDismiss)="onColorModalDismiss($event)"
+              >
+                <ng-template>
+                  <ion-toolbar>
+                    <ion-buttons slot="start">
+                      <ion-button (click)="closeColorModal()"
+                        >Cancel</ion-button
+                      >
+                    </ion-buttons>
+                    <ion-buttons slot="end">
+                      <ion-button (click)="confirmColorSelection()">
+                        Done
+                      </ion-button>
+                    </ion-buttons>
+                  </ion-toolbar>
+                  <ion-picker>
+                    <ion-picker-column
+                      [value]="currentColor"
+                      (ionChange)="onIonChange($event)"
+                    >
+                      <ion-picker-column-option value="#9cc2ff"
+                        >Blue</ion-picker-column-option
+                      >
+                      <ion-picker-column-option value="#d2ff9c"
+                        >Green</ion-picker-column-option
+                      >
+                      <ion-picker-column-option value="#ff9c9c"
+                        >Red</ion-picker-column-option
+                      >
+                      <ion-picker-column-option value="#fff39c"
+                        >Yellow</ion-picker-column-option
+                      >
+                    </ion-picker-column>
+                  </ion-picker>
+                </ng-template>
+              </ion-modal>
+            </ion-item>
+            <ion-item>
+              <ion-label>Authors</ion-label>
+              <ion-select
+                aria-label="Authors"
+                placeholder="For who is this?"
+                [multiple]="true"
+              >
+                <ion-select-option value="Yingsiu">Yingsiu</ion-select-option>
+                <ion-select-option value="Michelle">Michelle</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-list>
         </ion-content>
       </ng-template>
     </ion-modal>

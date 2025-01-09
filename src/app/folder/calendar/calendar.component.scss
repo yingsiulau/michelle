@@ -11,7 +11,7 @@
   align-items: center;
 }
 
-ion-datetime {
+#calendar {
   height: 500px;
 }
 
@@ -27,9 +27,14 @@ ion-fab {
 }
 
 :host ::ng-deep .calendar-next-prev {
-background-color: white !important;
+  background-color: white !important;
 }
 
 ion-datetime::part(month-year-button) {
-  padding: 8px 20px
+  padding: 8px 20px;
+}
+
+.full-width {
+  width: 100%;
+  --width: 100%; /* For Ionic's internal styling */
 }
